@@ -57,25 +57,20 @@ box off;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # q2
 % manual fft
-%analytic_M=zeros(size(t));
-%for j=1:length(t)
-%    for k=1:length(t)
-%      F(j)=t(k)*exp(-1i*2*pi*(j-1)*(k-1)/N);
-%      analytic_M(j)=analytic_M(j)+F(j);
-%    end
-%end
-%figure(2)
-%plot(f,analytic_M,"--r");
+analytic_X=sinc(f).*sin(1.5*2*pi*f)./(2*pi*f);
+figure(2);
+stem(f,abs(analytic_X)/max(analytic_X),"--r");
+
 
 # q3
 # fourier transform of m(t) --> M(f)
 X=fftshift(fft(x,N)/N); %since it's an even function scaled by 1/N
 figure(2)
 hold on;
-stem(f,X,"-b");
+stem(f,abs(X)/max(X),"-b");
 xlabel("Frequency (Hz)");
 ylabel("X(f)");
-legend("Using FFT");
+legend("Analytical Fourier Transform","Using FFT");
 box off;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
