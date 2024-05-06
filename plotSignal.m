@@ -64,7 +64,7 @@ stem(f,abs(analytic_X)/max(analytic_X),"--r");
 
 # q3
 # fourier transform of m(t) --> M(f)
-X=fftshift(fft(x,N)/N); %since it's an even function scaled by 1/N
+X=fftshift(fft(x,N)*ts); %non-periodic signals
 figure(2)
 hold on;
 stem(f,abs(X)/max(X),"-b");
@@ -98,7 +98,7 @@ end
 %% q5: Ideal LPF 1Hz
 lpf_1hz= abs(f)<1; % ones only if value less than 1hz
 X_filtered=X.*lpf_1hz;
-x_filtered=ifft(ifftshift(X_filtered)*N);
+x_filtered=ifft(ifftshift(X_filtered)/ts);
 %%%%% Plotting filtered vs original signal %%%%%%%%
 figure(3);
 plot(t, x_filtered, "--r");
@@ -111,10 +111,10 @@ box off;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%% Ideal LPF %%%%%%%%%%
-%% q5: Ideal LPF 0.3Hz
+%% q6: Ideal LPF 0.3Hz
 lpf= abs(f)<0.3; % ones only if value less than 0.3hz
 X_filtered=X.*lpf;
-x_filtered=ifft(ifftshift(X_filtered)*N);
+x_filtered=ifft(ifftshift(X_filtered)/ts);
 %%%%% Plotting filtered vs original signal %%%%%%%%
 figure(4);
 plot(t, x_filtered, "--r");
@@ -124,3 +124,62 @@ hold on;
 plot(t,x,"-b");
 legend("Signal after LPF 0.3Hz","Original Signal");
 box off;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% q7 defining new function
+close all;
+m=cos(2*pi*1*t);
+m((t>6)|(t<0))=0;
+
+%%%%% plotting in time domain
+figure(1);
+plot(t,m)
+box off;
+
+%%%% plotting in frequency domain
+M=fftshift(fft(m)*ts); % non-periodic signals
+figure(2);
+hold off;
+plot(f,abs(M));
+box off;
+
+%%%%%%%%%%%%%% getting band width
+Energy_total_freq= sum(abs(M).^2)*df;
+ %%%%% Band Width %%%%%%%%
+ # we first have to find f=0
+index_f0=find(f==0);
+# Initializing accumulate energy
+Energy_acc=0;
+for index_f= index_f0:length(f)
+  # we multiply by 2 to use the property of even function
+  Energy_acc+=2*(abs(M(index_f)).^2)*df;
+  # comparing it to 95% of total energy
+  if(Energy_acc>=0.95*Energy_total_freq)
+    BW2=f(index_f);
+    break
+  end
+end
+
+
+%%%%%% LPF 1Hz  %%%%%%%%%%%%%%%%
+M_filtered=M.*lpf_1hz;
+m_filtered=ifft(ifftshift(M_filtered)/ts);
+figure(3)
+hold off;
+plot(t,m_filtered,"--r");
+hold on;
+plot(t,m,"-b");
+legend("Signal after LPF 1Hz","Original Signal");
+box off;
+
+%%%%%%%% LPF 0.3Hz %%%%%%%%%%%%
+M_filtered=M.*lpf;
+m_filtered=ifft(ifftshift(M_filtered)/ts);
+figure(4)
+hold off;
+plot(t,m_filtered,"--r");
+hold on;
+plot(t,m,"-b");
+legend("Signal after LPF 0.3Hz","Original Signal");
+box off;
+
