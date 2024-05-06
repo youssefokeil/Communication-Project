@@ -40,16 +40,16 @@ end
 # q1 plot function x(t)
 %adding linear part
 %getting indices
-m=zeros(size(t));
+x=zeros(size(t));
 less_neg1=(t<-1) & (t>=-2);
 more_pos1=(t>1)&(t<=2);
-m(less_neg1)=t(less_neg1)+2*ones(size(t(less_neg1))); %2+t graph
-m(more_pos1)=-t(more_pos1)+2*ones(size(t(more_pos1))); %2-t graph
-m((t>=-1) & (t<=1))=ones(size(t(t>=-1&t<=1)));
+x(less_neg1)=t(less_neg1)+2*ones(size(t(less_neg1))); %2+t graph
+x(more_pos1)=-t(more_pos1)+2*ones(size(t(more_pos1))); %2-t graph
+x((t>=-1) & (t<=1))=ones(size(t(t>=-1&t<=1)));
 
 
 figure(1);
-plot(t,m);
+plot(t,x);
 xlabel("Time (sec)");
 ylabel("x(t)");
 box off;
@@ -69,18 +69,18 @@ box off;
 
 # q3
 # fourier transform of m(t) --> M(f)
-M=fftshift(fft(m,N)/N); %since it's an even function scaled by 1/N
+X=fftshift(fft(x,N)/N); %since it's an even function scaled by 1/N
 figure(2)
 hold on;
-stem(f,M,"-b");
+stem(f,X,"-b");
 xlabel("Frequency (Hz)");
-ylabel("M(f)");
+ylabel("X(f)");
 legend("Using FFT");
 box off;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % q4: Band Width
-Energy_from_freq=sum(abs(M).^2)*df;
+Energy_from_freq=sum(abs(X).^2)*df;
 # by looking at both variables values in workspace we can verify parseval's theorem.
 
 %%%%%% Finding Band Width %%%%%%%%%%
@@ -90,7 +90,7 @@ index_f0=find(f==0);
 Energy_acc=0;
 for index_f= index_f0:length(f)
   # we multiply by 2 to use the property of even function
-  Energy_acc+=2*(abs(M(index_f)).^2)*df;
+  Energy_acc+=2*(abs(X(index_f)).^2)*df;
   # comparing it to 95% of total energy
   if(Energy_acc>=0.95*Energy_from_freq)
     BW=f(index_f);
@@ -102,15 +102,15 @@ end
 %%%%%%%% Ideal LPF %%%%%%%%%%
 %% q5: Ideal LPF 1Hz
 lpf_1hz= abs(f)<1; % ones only if value less than 1hz
-M_filtered=M.*lpf_1hz;
-m_filtered=ifft(ifftshift(M_filtered)*N);
+X_filtered=X.*lpf_1hz;
+x_filtered=ifft(ifftshift(X_filtered)*N);
 %%%%% Plotting filtered vs original signal %%%%%%%%
 figure(3);
-plot(t, m_filtered, "--r");
+plot(t, x_filtered, "--r");
 xlabel("Time (sec)");
-ylabel("m(t)");
+ylabel("x(t)");
 hold on;
-plot(t,m,"-b");
+plot(t,x,"-b");
 legend("Signal after LPF 1Hz","Original Signal");
 box off;
 
@@ -118,14 +118,14 @@ box off;
 %%%%%%%% Ideal LPF %%%%%%%%%%
 %% q5: Ideal LPF 0.3Hz
 lpf= abs(f)<0.3; % ones only if value less than 0.3hz
-M_filtered=M.*lpf;
-m_filtered=ifft(ifftshift(M_filtered)*N);
+X_filtered=X.*lpf;
+x_filtered=ifft(ifftshift(X_filtered)*N);
 %%%%% Plotting filtered vs original signal %%%%%%%%
 figure(4);
-plot(t, m_filtered, "--r");
+plot(t, x_filtered, "--r");
 xlabel("Time (sec)");
-ylabel("m(t)");
+ylabel("x(t)");
 hold on;
-plot(t,m,"-b");
+plot(t,x,"-b");
 legend("Signal after LPF 0.3Hz","Original Signal");
 box off;
