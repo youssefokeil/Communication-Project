@@ -97,11 +97,11 @@ end
 %%%%%%%% Ideal LPF %%%%%%%%%%
 %% q5: Ideal LPF 1Hz
 lpf_1hz= abs(f)<1; % ones only if value less than 1hz
-X_filtered=X.*lpf_1hz;
-x_filtered=ifft(ifftshift(X_filtered)/ts);
+X_filtered_1hz=X.*lpf_1hz;
+x_filtered_1hz=ifft(ifftshift(X_filtered_1hz)/ts);
 %%%%% Plotting filtered vs original signal %%%%%%%%
 figure(3);
-plot(t, x_filtered, "--r");
+plot(t, x_filtered_1hz, "--r");
 xlabel("Time (sec)");
 ylabel("x(t)");
 hold on;
@@ -195,7 +195,7 @@ c1=cos(2*pi*fc1*t);   # first carrier
 c2=cos(2*pi*fc2*t);    # second carrier
 
 %% first signal
-s1 = x_filtered.*c1;  %% Define signal s1 in time domain
+s1 = x_filtered_1hz.*c1;  %% Define signal s1 in time domain
 figure(1);
 plot(t,s1);
 xlabel("Time (sec)");
@@ -251,7 +251,7 @@ H = abs(f)< BW;
  figure(5);
 plot(t,x_recieved/max(x_recieved),"--b");
 hold on
-plot(t,x_filtered/max(x_filtered),"-r");
+plot(t,x_filtered_1hz/max(x_filtered_1hz),"-r");
 xlabel("Time (sec)");
 ylabel("x(t)");
 legend("recieved message","input message");
