@@ -183,3 +183,89 @@ plot(t,m,"-b");
 legend("Signal after LPF 0.3Hz","Original Signal");
 box off;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%q8:
+BW=3; #Each channel bandwidth is 3 Hz
+# carrier frequency initialization
+fc1=20; #20Hz first carrier frequency
+fc2=25.5 # fc1+3+2.5 =25.5Hz second carrier frequency
+c1=cos(2*pi*fc1*t);   # first carrier
+
+%% q10 : value for c2
+c2=cos(2*pi*fc2*t);    # second carrier
+
+%% first signal
+s1 = x_filtered.*c1;  %% Define signal s1 in time domain
+figure(1);
+plot(t,s1);
+xlabel("Time (sec)");
+ylabel("s1(t)");
+box off;
+
+%% second signal
+s2 = m.*c2;  %% Define signal s2 in time domain
+figure(2);
+plot(t,s2);
+xlabel("Time (sec)");
+ylabel("s2(t)");
+box off;
+
+
+% q9 : SSB signal USB
+  %% Filter
+  S2=fftshift(fft(s2,N)*ts); %non-periodic signals
+  H = zeros(size(f));
+  H(f>fc2 & f<(fc2+BW))=1; %% +ve frequency
+  H(f<-fc2 & f>-(fc2+BW))=1; %% -ve frequency
+  %% Filter spectrum
+  S2 = S2.*H;
+  s2=real(ifft(ifftshift(S2) / ts));
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %q11 :  s(t)= s1(t) + s2(t)
+  %% plot signal in time domain
+  s=s1+s2;
+  figure(3);
+plot(t,s);
+xlabel("Time (sec)");
+ylabel("s(t)");
+box off;
+
+%% plot signal in frequency domain
+  S=fftshift(fft(s,N)*ts);
+  figure(4);
+  plot(f,S);
+xlabel("Frequency (HZ)");
+ylabel("S(f)");
+box off;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% q12: coherent demodulator
+  g1=s.*c1;
+  G1 = fftshift(fft (g1)) *ts;
+  %% LPF (ideal)
+H = abs(f)< BW;
+%% After LPF
+%% retrieve first message
+ x_recieved= real(ifft(ifftshift(H.*G1) /ts));
+ figure(5);
+plot(t,x_recieved/max(x_recieved),"--b");
+hold on
+plot(t,x_filtered/max(x_filtered),"-r");
+xlabel("Time (sec)");
+ylabel("x(t)");
+legend("recieved message","input message");
+box off;
+
+%% retrieve second message
+g2=s.*c2;
+  G2 = fftshift(fft (g2)) *ts;
+m_recieved= real(ifft(ifftshift(H.*G2) /ts));
+figure(6);
+plot(t,m_recieved/max(m_recieved),"--b");
+hold on
+plot(t,m/max(m),"-r");
+xlabel("Time (sec)");
+ylabel("x(t)");
+legend("recieved message","input message");
+box off;
